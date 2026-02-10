@@ -2,12 +2,23 @@ import 'package:fake_store/screens/settings_screen.dart';
 import 'package:fake_store/screens/wishlist_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'screens/onboarding_screen.dart';
-import 'screens/routernav.dart';
-import 'package:go_router/go_router.dart';
+import 'screens/discover_screen.dart';
+import 'models/product.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Hive
+  await Hive.initFlutter();
+
+  // Register Adapter
+  Hive.registerAdapter(ProductAdapter());
+
+  // Open Boxes
+  await Hive.openBox<Product>('productsBox');
+  await Hive.openBox<Product>('wishlistBox');
 
   final prefs = await SharedPreferences.getInstance();
   final bool onboardingCompleted =
@@ -90,7 +101,9 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6C63FF)),
         useMaterial3: true,
       ),
-      routerConfig: _router,
+      home: _showOnboarding
+          ? OnboardingScreen(onComplete: _onOnboardingComplete)
+          : const DiscoverScreen(),
     );
   }
 }
