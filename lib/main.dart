@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'screens/onboarding_screen.dart';
+import 'screens/discover_screen.dart';
+import 'models/product.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Hive
+  await Hive.initFlutter();
+  
+  // Register Adapter
+  Hive.registerAdapter(ProductAdapter());
+  
+  // Open Box
+  await Hive.openBox<Product>('productsBox');
 
   final prefs = await SharedPreferences.getInstance();
   final bool onboardingCompleted =
@@ -46,7 +58,7 @@ class _MyAppState extends State<MyApp> {
       ),
       home: _showOnboarding
           ? OnboardingScreen(onComplete: _onOnboardingComplete)
-          : const MyHomePage(title: 'Fake Store'),
+          : const DiscoverScreen(),
     );
   }
 }
