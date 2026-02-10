@@ -10,12 +10,13 @@ void main() async {
 
   // Initialize Hive
   await Hive.initFlutter();
-  
+
   // Register Adapter
   Hive.registerAdapter(ProductAdapter());
-  
-  // Open Box
+
+  // Open Boxes
   await Hive.openBox<Product>('productsBox');
+  await Hive.openBox<Product>('wishlistBox');
 
   final prefs = await SharedPreferences.getInstance();
   final bool onboardingCompleted =

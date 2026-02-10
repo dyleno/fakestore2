@@ -83,14 +83,13 @@ class _NavbarWidgetState extends State<NavbarWidget> with TickerProviderStateMix
             ),
           ],
           onDestinationSelected: (int value) {
-            // Wishlist animation logic
+            
             if (value == 1) {
               _wishlistController.forward(from: 0.0);
             } else if (selectedPage == 1) {
               _wishlistController.reverse(from: 1.0);
             }
 
-            // Settings animation logic
             if (value == 2) {
               _settingsController.forward(from: 0.0);
             } else if (selectedPage == 2) {
