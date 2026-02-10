@@ -324,29 +324,24 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                 Expanded(
                                   child: Text(
                                     isNowFavorite
-                                        ? 'Item toegevoegd aan wishlist'
-                                        : 'Item verwijderd uit wishlist',
+                                        ? 'Toegevoegd aan wishlist'
+                                        : 'Verwijderd uit wishlist',
                                     style: const TextStyle(
-                                        fontWeight: FontWeight.w600),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13),
                                   ),
                                 ),
                               ],
                             ),
                             behavior: SnackBarBehavior.floating,
                             duration: const Duration(seconds: 2),
+                            margin: const EdgeInsets.only(
+                                bottom: 20, left: 20, right: 20),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),
                             backgroundColor: isNowFavorite
                                 ? const Color(0xFF6C63FF)
                                 : Colors.black87,
-                            action: isNowFavorite
-                                ? SnackBarAction(
-                                    label: 'BEKIJK',
-                                    textColor: Colors.white,
-                                    onPressed: () =>
-                                        selectedPageNotifier.value = 1,
-                                  )
-                                : null,
                           ),
                         );
                       }
