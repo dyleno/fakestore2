@@ -1,6 +1,10 @@
+import 'package:fake_store/screens/settings_screen.dart';
+import 'package:fake_store/screens/wishlist_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/onboarding_screen.dart';
+import 'screens/routernav.dart';
+import 'package:go_router/go_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,6 +14,9 @@ void main() async {
       prefs.getBool('onboarding_completed') ?? false;
   runApp(MyApp(showOnboarding: !onboardingCompleted));
 }
+
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final _sectionNavigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatefulWidget {
   final bool showOnboarding;
@@ -21,32 +28,69 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late bool _showOnboarding;
+  late final GoRouter _router;
 
   @override
   void initState() {
     super.initState();
-    _showOnboarding = widget.showOnboarding;
-  }
-
-  void _onOnboardingComplete() {
-    setState(() {
-      _showOnboarding = false;
-    });
+    _router = GoRouter(
+      navigatorKey: _rootNavigatorKey,
+      initialLocation: widget.showOnboarding ? '/onboarding' : '/home',
+      routes: <RouteBase>[
+        GoRoute(
+          path: '/onboarding',
+          builder: (context, state) => OnboardingScreen(
+            onComplete: () {
+              context.go('/home');
+            },
+          ),
+        ),
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) {
+            return NavPage(navigationShell: navigationShell);
+          },
+          branches: [
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/home',
+                  builder: (context, state) =>
+                      const MyHomePage(title: 'Fake Store'),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/wishlist',
+                  builder: (context, state) => const WishlistScreen(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/settings',
+                  builder: (context, state) => const SettingsScreen(),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Fake Store',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6C63FF)),
         useMaterial3: true,
       ),
-      home: _showOnboarding
-          ? OnboardingScreen(onComplete: _onOnboardingComplete)
-          : const MyHomePage(title: 'Fake Store'),
+      routerConfig: _router,
     );
   }
 }
@@ -61,39 +105,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
+      body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+          children: <Widget>[],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
