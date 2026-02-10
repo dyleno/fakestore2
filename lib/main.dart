@@ -1,10 +1,12 @@
 import 'package:fake_store/screens/settings_screen.dart';
 import 'package:fake_store/screens/wishlist_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/discover_screen.dart';
+import 'screens/routernav.dart';
 import 'models/product.dart';
 
 void main() async {
@@ -27,7 +29,6 @@ void main() async {
 }
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
-final _sectionNavigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatefulWidget {
   final bool showOnboarding;
@@ -65,8 +66,7 @@ class _MyAppState extends State<MyApp> {
               routes: [
                 GoRoute(
                   path: '/home',
-                  builder: (context, state) =>
-                      const MyHomePage(title: 'Fake Store'),
+                  builder: (context, state) => const DiscoverScreen(),
                 ),
               ],
             ),
@@ -101,35 +101,7 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6C63FF)),
         useMaterial3: true,
       ),
-      home: _showOnboarding
-          ? OnboardingScreen(onComplete: _onOnboardingComplete)
-          : const DiscoverScreen(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[],
-        ),
-      ),
+      routerConfig: _router,
     );
   }
 }
