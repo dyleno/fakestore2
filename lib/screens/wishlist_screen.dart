@@ -21,10 +21,6 @@ class _WishlistScreenState extends State<WishlistScreen> {
       builder: (context, wishlist, child) {
         return Scaffold(
           appBar: AppBar(
-            elevation: 0,
-            scrolledUnderElevation: 2,
-            backgroundColor: Colors.white,
-            surfaceTintColor: Colors.white,
             title: const Text(
               'Mijn Favorieten',
               style: TextStyle(
@@ -82,11 +78,11 @@ class _WishlistScreenState extends State<WishlistScreen> {
               width: 160,
               height: 160,
               decoration: BoxDecoration(
-                color: const Color(0xFF6C63FF).withAlpha(26), // 0.1 * 255
+                color: const Color(0xFF2196F3).withAlpha(26),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.favorite_outline,
-                  size: 80, color: Color(0xFF6C63FF)),
+                  size: 80, color: Color(0xFF2196F3)),
             ),
             const SizedBox(height: 32),
             const Text(
@@ -109,7 +105,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
               child: ElevatedButton(
                 onPressed: () => context.go('/home'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6C63FF),
+                  backgroundColor: const Color(0xFF2196F3),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   shape: RoundedRectangleBorder(
