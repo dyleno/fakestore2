@@ -14,17 +14,16 @@ class DiscoverScreen extends StatefulWidget {
 class _DiscoverScreenState extends State<DiscoverScreen> {
   final ApiService _apiService = ApiService();
   final WishlistService _wishlistService = WishlistService();
-  late Future<List<Product>> _productsFuture;
+  late final Future<List<Product>> _productsFuture = _apiService.getProducts();
+  late final Future<List<String>> _categoriesFuture =
+      _apiService.getCategories();
+
+  // Filter state
+  String _selectedCategory = 'Alle';
 
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   bool _isSearching = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _productsFuture = _apiService.getProducts();
-  }
 
   @override
   void dispose() {
@@ -87,7 +86,68 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           ),
         ],
       ),
-      body: _buildProductGrid(),
+      body: Column(
+        children: [
+          _buildCategoryFilter(),
+          Expanded(child: _buildProductGrid()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryFilter() {
+    return FutureBuilder<List<String>>(
+      future: _categoriesFuture,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const SizedBox.shrink();
+
+        final categories = ['Alle', ...snapshot.data!];
+
+        return Container(
+          height: 60,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: categories.length,
+            itemBuilder: (context, index) {
+              final category = categories[index];
+              final isSelected = _selectedCategory == category;
+
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: FilterChip(
+                  label: Text(
+                    category[0].toUpperCase() + category.substring(1),
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : Colors.black87,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedCategory = category;
+                    });
+                  },
+                  backgroundColor: Colors.grey[100],
+                  selectedColor: const Color(0xFF6C63FF),
+                  checkmarkColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      color: isSelected
+                          ? const Color(0xFF6C63FF)
+                          : Colors.transparent,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -105,8 +165,12 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
         final allProducts = snapshot.data!;
         final products = allProducts.where((p) {
-          return p.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-              p.category.toLowerCase().contains(_searchQuery.toLowerCase());
+          final matchesSearch =
+              p.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                  p.category.toLowerCase().contains(_searchQuery.toLowerCase());
+          final matchesCategory =
+              _selectedCategory == 'Alle' || p.category == _selectedCategory;
+          return matchesSearch && matchesCategory;
         }).toList();
 
         if (products.isEmpty && _searchQuery.isNotEmpty) {

@@ -19,7 +19,6 @@ class WishlistService {
       _updateNotifier();
     } catch (e) {
       debugPrint('Fout bij initialiseren van wishlistBox: $e');
-      // debugPrint('Fout bij initialiseren van wishlistBox: $e');
     }
   }
 
