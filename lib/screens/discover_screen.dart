@@ -21,7 +21,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   // Filter state
   String _selectedCategory = 'Alle';
 
-  // Search state
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   bool _isSearching = false;
@@ -36,10 +35,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 2,
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
         title: _isSearching
             ? TextField(
                 controller: _searchController,
