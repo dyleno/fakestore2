@@ -16,7 +16,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   final WishlistService _wishlistService = WishlistService();
   late Future<List<Product>> _productsFuture;
 
-  // Search state
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   bool _isSearching = false;
@@ -37,10 +36,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 2,
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
         title: _isSearching
             ? TextField(
                 controller: _searchController,

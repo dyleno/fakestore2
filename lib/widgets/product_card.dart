@@ -61,7 +61,7 @@ class ProductCard extends StatelessWidget {
                     Text(
                       '€${product.price.toStringAsFixed(2)}',
                       style: const TextStyle(
-                        color: Color(0xFF6C63FF),
+                        color: Color(0xFF2196F3),
                         fontWeight: FontWeight.w800,
                         fontSize: 16,
                       ),
@@ -104,7 +104,7 @@ class ProductCard extends StatelessWidget {
                 final isFavorite = wishlistService.isInWishlist(product.id);
                 return Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(204), // 0.8 * 255
+                    color: Colors.white.withAlpha(204),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
@@ -151,7 +151,7 @@ class ProductCard extends StatelessWidget {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),
                             backgroundColor: isNowFavorite
-                                ? const Color(0xFF6C63FF)
+                                ? const Color(0xFF2196F3)
                                 : Colors.black87,
                           ),
                         );
