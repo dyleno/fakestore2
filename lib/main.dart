@@ -1,3 +1,5 @@
+import 'package:fake_store/screens/chat_screen.dart';
+import 'package:fake_store/screens/product_detail_screen.dart';
 import 'package:fake_store/screens/settings_screen.dart';
 import 'package:fake_store/screens/wishlist_screen.dart';
 import 'package:flutter/material.dart';
@@ -11,14 +13,10 @@ import 'models/product.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Hive
   await Hive.initFlutter();
-
-  // Register Adapter
-  Hive.registerAdapter(ProductAdapter());
-
-  // Open Boxes
+  if (!Hive.isAdapterRegistered(0)) {
+    Hive.registerAdapter(ProductAdapter());
+  }
   await Hive.openBox<Product>('productsBox');
   await Hive.openBox<Product>('wishlistBox');
 
@@ -32,7 +30,6 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatefulWidget {
   final bool showOnboarding;
-
   const MyApp({super.key, required this.showOnboarding});
 
   @override
@@ -48,14 +45,29 @@ class _MyAppState extends State<MyApp> {
     _router = GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: widget.showOnboarding ? '/onboarding' : '/home',
-      routes: <RouteBase>[
+      debugLogDiagnostics: true,
+      routes: [
         GoRoute(
           path: '/onboarding',
           builder: (context, state) => OnboardingScreen(
-            onComplete: () {
-              context.go('/home');
-            },
+            onComplete: () => context.go('/home'),
           ),
+        ),
+        GoRoute(
+          path: '/product-details',
+          parentNavigatorKey: _rootNavigatorKey,
+          builder: (context, state) {
+            final product = state.extra as Product;
+            return ProductDetailScreen(product: product);
+          },
+        ),
+        GoRoute(
+          path: '/chat',
+          parentNavigatorKey: _rootNavigatorKey,
+          builder: (context, state) {
+            final product = state.extra as Product;
+            return ChatScreen(product: product);
+          },
         ),
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
