@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../models/product.dart';
 import '../services/api_service.dart';
 import '../services/wishlist_service.dart';
@@ -76,12 +77,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           IconButton(
             icon: const Icon(Icons.shopping_bag_outlined),
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Winkelwagen komt binnenkort! ❤️'),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+              context.push('/cart');
             },
           ),
         ],

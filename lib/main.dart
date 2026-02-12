@@ -1,4 +1,5 @@
 import 'package:fake_store/screens/chat_screen.dart';
+import 'package:fake_store/screens/cart_page.dart';
 import 'package:fake_store/screens/product_detail_screen.dart';
 import 'package:fake_store/screens/settings_screen.dart';
 import 'package:fake_store/screens/wishlist_screen.dart';
@@ -11,6 +12,7 @@ import 'screens/onboarding_screen.dart';
 import 'screens/discover_screen.dart';
 import 'screens/routernav.dart';
 import 'models/product.dart';
+import 'models/cart_item.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,8 +20,12 @@ void main() async {
   if (!Hive.isAdapterRegistered(0)) {
     Hive.registerAdapter(ProductAdapter());
   }
+  if (!Hive.isAdapterRegistered(1)) {
+    Hive.registerAdapter(CartItemAdapter());
+  }
   await Hive.openBox<Product>('productsBox');
   await Hive.openBox<Product>('wishlistBox');
+  await Hive.openBox<CartItem>('cartBox');
 
   final prefs = await SharedPreferences.getInstance();
   final bool onboardingCompleted =
@@ -61,6 +67,11 @@ class _MyAppState extends State<MyApp> {
             final product = state.extra as Product;
             return ProductDetailScreen(product: product);
           },
+        ),
+        GoRoute(
+          path: '/cart',
+          parentNavigatorKey: _rootNavigatorKey,
+          builder: (context, state) => const CartPage(),
         ),
         GoRoute(
           path: '/chat',

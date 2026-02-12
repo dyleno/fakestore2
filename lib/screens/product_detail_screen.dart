@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../models/product.dart';
 import '../services/wishlist_service.dart';
+import '../services/cart_service.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -571,9 +572,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             Expanded(
               child: ElevatedButton(
                 onPressed: () {
+                  CartService().addToCart(
+                    widget.product,
+                    size: _selectedSize,
+                    color: _selectedColorTint != null
+                        ? 'Color ${_colors.indexOf(_selectedColorTint!) + 1}'
+                        : null,
+                  );
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Toegevoegd aan winkelwagen! 🛍️'),
+                      content: Text('Toegevoegd aan mandjes! 🛍️'),
                       behavior: SnackBarBehavior.floating,
                     ),
                   );
@@ -592,7 +600,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Icon(Icons.shopping_bag_outlined, size: 20),
                     SizedBox(width: 12),
                     Text(
-                      'Bestellen',
+                      'In mijn mandje',
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
