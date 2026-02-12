@@ -45,7 +45,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           _buildAppBar(),
@@ -80,17 +80,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildAppBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SliverAppBar(
       expandedHeight: 400,
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF121212) : Colors.white,
       elevation: 0,
       leadingWidth: 70,
       leading: Padding(
         padding: const EdgeInsets.all(8.0),
         child: CircleAvatar(
-          backgroundColor: Colors.white.withAlpha(204),
+          backgroundColor:
+              isDark ? Colors.white10 : Colors.white.withAlpha(204),
           child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black87),
+            icon: Icon(Icons.arrow_back,
+                color: isDark ? Colors.white : Colors.black87),
             onPressed: () => Navigator.pop(context),
           ),
         ),
@@ -99,9 +102,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: CircleAvatar(
-            backgroundColor: Colors.white.withAlpha(204),
+            backgroundColor:
+                isDark ? Colors.white10 : Colors.white.withAlpha(204),
             child: IconButton(
-              icon: const Icon(Icons.share_outlined, color: Colors.black87),
+              icon: Icon(Icons.share_outlined,
+                  color: isDark ? Colors.white : Colors.black87),
               onPressed: () {},
             ),
           ),
@@ -111,7 +116,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         background: Hero(
           tag: 'product_image_${widget.product.id}',
           child: Container(
-            color: Colors.white,
+            color: isDark ? const Color(0xFF121212) : Colors.white,
             padding:
                 const EdgeInsets.only(top: 80, bottom: 40, left: 40, right: 40),
             child: ColorFiltered(
@@ -137,10 +142,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         Expanded(
           child: Text(
             widget.product.title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF2D3142),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : const Color(0xFF2D3142),
               letterSpacing: -0.5,
             ),
           ),
@@ -252,6 +259,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildSizeSelection() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -289,14 +297,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   decoration: BoxDecoration(
-                    color:
-                        isSelected ? const Color(0xFF6C63FF) : Colors.grey[100],
+                    color: isSelected
+                        ? const Color(0xFF6C63FF)
+                        : (isDark ? Colors.white12 : Colors.grey[100]),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     size,
                     style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.black87,
+                      color: isSelected
+                          ? Colors.white
+                          : (Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white70
+                              : Colors.black87),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -310,9 +323,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void _showSizeGuide(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -337,7 +351,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       height: 4,
                       margin: const EdgeInsets.only(bottom: 20),
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
+                        color: isDark ? Colors.white24 : Colors.grey[300],
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -345,10 +359,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Size Guide',
                         style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black),
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
@@ -359,7 +375,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   const SizedBox(height: 16),
                   Text(
                     'Alle afmetingen zijn in centimeters (cm).',
-                    style: TextStyle(color: Colors.grey[600]),
+                    style: TextStyle(
+                        color: isDark ? Colors.white60 : Colors.grey[600]),
                   ),
                   const SizedBox(height: 24),
                   _buildSizeTable(),
@@ -389,6 +406,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildSizeTable() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isClothing =
         widget.product.category.toLowerCase().contains('clothing');
 
@@ -396,19 +414,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.grey[50],
+          color: isDark ? Colors.white10 : Colors.grey[50],
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Text(
+        child: Text(
           'Voor dit product is geen specifieke maattabel beschikbaar. Het betreft een \'Universal\' maat.',
-          style: TextStyle(fontStyle: FontStyle.italic),
+          style: TextStyle(
+              fontStyle: FontStyle.italic,
+              color: isDark ? Colors.white70 : Colors.black),
         ),
       );
     }
 
     return Table(
-      border:
-          TableBorder.symmetric(inside: BorderSide(color: Colors.grey[200]!)),
+      border: TableBorder.symmetric(
+          inside:
+              BorderSide(color: isDark ? Colors.white10 : Colors.grey[200]!)),
       children: [
         _buildTableRow(['Maat', 'Borst', 'Lengte'], isHeader: true),
         _buildTableRow(['S', '92-96', '68-70']),
@@ -421,6 +442,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   TableRow _buildTableRow(List<String> cells, {bool isHeader = false}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return TableRow(
       children: cells.map((cell) {
         return Padding(
@@ -430,7 +452,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-              color: isHeader ? Colors.black : Colors.grey[700],
+              color: isHeader
+                  ? (isDark ? Colors.white : Colors.black)
+                  : (isDark ? Colors.white70 : Colors.grey[700]),
             ),
           ),
         );
@@ -439,19 +463,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildDescription() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Beschrijving',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black),
         ),
         const SizedBox(height: 12),
         Text(
           widget.product.description,
           style: TextStyle(
             fontSize: 15,
-            color: Colors.grey[600],
+            color: isDark ? Colors.white70 : Colors.grey[600],
             height: 1.6,
           ),
         ),
@@ -470,13 +498,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildSpecItem(IconData icon, String title, String value) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.grey[50],
+          color: isDark ? Colors.white10 : Colors.grey[50],
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey[100]!),
+          border:
+              Border.all(color: isDark ? Colors.white10 : Colors.grey[100]!),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -493,10 +523,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             const SizedBox(height: 4),
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D3142)),
+                  color: isDark ? Colors.white : const Color(0xFF2D3142)),
             ),
           ],
         ),
@@ -505,13 +535,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildBottomBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(13),
+            color: isDark ? Colors.black38 : Colors.black.withAlpha(13),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -528,11 +559,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[200]!),
+                  border: Border.all(
+                      color: isDark ? Colors.white10 : Colors.grey[200]!),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(Icons.chat_bubble_outline,
-                    color: Color(0xFF2D3142)),
+                child: Icon(Icons.chat_bubble_outline,
+                    color: isDark ? Colors.white : const Color(0xFF2D3142)),
               ),
             ),
             const SizedBox(width: 16),
@@ -578,12 +610,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               'Reviews',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black),
             ),
             Text(
               'Bekijk alles',
@@ -604,11 +641,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildReviewItem(String name, double rating, String comment) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: isDark ? Colors.white10 : Colors.grey[50],
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -617,14 +655,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(name,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black)),
               Row(
                 children: [
                   const Icon(Icons.star, color: Colors.amber, size: 14),
                   const SizedBox(width: 4),
                   Text(rating.toString(),
-                      style: const TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.bold)),
+                      style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black)),
                 ],
               ),
             ],
@@ -632,8 +675,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           const SizedBox(height: 8),
           Text(
             comment,
-            style:
-                TextStyle(color: Colors.grey[600], fontSize: 13, height: 1.5),
+            style: TextStyle(
+                color: isDark ? Colors.white70 : Colors.grey[600],
+                fontSize: 13,
+                height: 1.5),
           ),
         ],
       ),

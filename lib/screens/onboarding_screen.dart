@@ -20,7 +20,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       title: 'Ontdek Nieuwe Trends',
       description:
           'Vind de nieuwste mode en producten die perfect bij jouw stijl passen.',
-      color: const Color(0xFF2196F3),
+      color: const Color(0xFF6C63FF),
     ),
     OnboardingPage(
       icon: Icons.shopping_cart_checkout,

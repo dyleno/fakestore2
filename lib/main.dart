@@ -115,7 +115,7 @@ class _MyAppState extends State<MyApp> {
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFF2196F3),
+              seedColor: const Color(0xFF6C63FF),
               brightness: Brightness.light,
             ),
             useMaterial3: true,
@@ -128,13 +128,13 @@ class _MyAppState extends State<MyApp> {
             ),
             bottomNavigationBarTheme: const BottomNavigationBarThemeData(
               backgroundColor: Colors.white,
-              selectedItemColor: Color(0xFF2196F3),
+              selectedItemColor: Color(0xFF6C63FF),
               unselectedItemColor: Colors.grey,
             ),
           ),
           darkTheme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFF2196F3),
+              seedColor: const Color(0xFF6C63FF),
               brightness: Brightness.dark,
             ),
             useMaterial3: true,
@@ -148,7 +148,7 @@ class _MyAppState extends State<MyApp> {
             ),
             bottomNavigationBarTheme: const BottomNavigationBarThemeData(
               backgroundColor: Color(0xFF1E1E1E),
-              selectedItemColor: Color(0xFF2196F3),
+              selectedItemColor: Color(0xFF6C63FF),
               unselectedItemColor: Colors.grey,
             ),
           ),
