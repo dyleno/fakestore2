@@ -18,10 +18,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   late final Future<List<String>> _categoriesFuture =
       _apiService.getCategories();
 
-  // Filter state
   String _selectedCategory = 'Alle';
 
-  // Search state
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   bool _isSearching = false;
