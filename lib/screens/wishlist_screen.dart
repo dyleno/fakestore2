@@ -78,11 +78,11 @@ class _WishlistScreenState extends State<WishlistScreen> {
               width: 160,
               height: 160,
               decoration: BoxDecoration(
-                color: const Color(0xFF2196F3).withAlpha(26),
+                color: const Color(0xFF6C63FF).withAlpha(26),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.favorite_outline,
-                  size: 80, color: Color(0xFF2196F3)),
+                  size: 80, color: Color(0xFF6C63FF)),
             ),
             const SizedBox(height: 32),
             const Text(
@@ -105,7 +105,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
               child: ElevatedButton(
                 onPressed: () => context.go('/home'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2196F3),
+                  backgroundColor: const Color(0xFF6C63FF),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   shape: RoundedRectangleBorder(

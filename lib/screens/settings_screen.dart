@@ -51,7 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         themeProvider
                             .setTheme(val ? ThemeMode.dark : ThemeMode.light);
                       },
-                      activeColor: const Color(0xFF6C63FF),
+                      activeThumbColor: const Color(0xFF6C63FF),
                     ),
                     onTap: () {
                       themeProvider.toggleTheme();
@@ -68,7 +68,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               _buildSettingsItem(
                 icon: Icons.cloud_outlined,
-                iconColor: Colors.blue,
+                iconColor: const Color(0xFF6C63FF),
                 title: 'Used Storage',
                 isDark: isDark,
                 trailing: Text(
@@ -259,7 +259,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFF2196F3),
+            color: const Color(0xFF6C63FF),
             borderRadius: BorderRadius.circular(12),
           ),
           child: const Icon(Icons.shopping_bag, color: Colors.white, size: 28),
