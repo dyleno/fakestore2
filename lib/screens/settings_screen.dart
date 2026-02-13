@@ -1,3 +1,4 @@
+import 'package:fake_store/services/cart_service.dart';
 import 'package:fake_store/services/wishlist_service.dart';
 import 'package:fake_store/theme_provider.dart';
 import 'package:flutter/material.dart';
@@ -100,6 +101,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ThemeProvider().setTheme(ThemeMode.system);
 
                   WishlistService().clearWishlist();
+                  CartService().clearCart();
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -126,7 +128,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const Padding(
             padding: EdgeInsets.only(left: 16, top: 8, right: 16),
             child: Text(
-              'Clearing the cache can cause light mode to be restored and the shopping cart to be emptied.',
+              'Clearing the cache can cause light mode to be restored and the shopping cart/whishlist to be emptied.',
               style: TextStyle(color: Colors.grey, fontSize: 13, height: 1.4),
             ),
           ),
