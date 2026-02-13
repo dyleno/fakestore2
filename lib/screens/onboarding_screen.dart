@@ -74,7 +74,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Skip button
             Align(
               alignment: Alignment.topRight,
               child: Padding(
@@ -92,7 +91,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
             ),
-            // Page content
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
@@ -103,7 +101,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
               ),
             ),
-            // Page indicators
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 24.0),
               child: Row(
@@ -114,7 +111,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
             ),
-            // Navigation button
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
               child: SizedBox(
@@ -158,7 +154,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             width: 180,
             height: 180,
             decoration: BoxDecoration(
-              color: page.color.withValues(alpha: 0.1),
+              color: page.color.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(

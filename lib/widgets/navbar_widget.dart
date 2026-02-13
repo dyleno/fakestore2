@@ -1,106 +1,60 @@
 import 'package:flutter/material.dart';
-import 'package:fake_store/data/notifiers.dart';
-import 'package:lottie/lottie.dart';
+import 'package:go_router/go_router.dart';
 
 class NavbarWidget extends StatefulWidget {
-  const NavbarWidget({super.key});
+  final StatefulNavigationShell navigationShell;
+
+  const NavbarWidget({super.key, required this.navigationShell});
 
   @override
   State<NavbarWidget> createState() => _NavbarWidgetState();
 }
 
-class _NavbarWidgetState extends State<NavbarWidget> with TickerProviderStateMixin {
-  late final AnimationController _wishlistController;
-  late final AnimationController _settingsController;
-
-  @override
-  void initState() {
-    super.initState();
-    _wishlistController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
+class _NavbarWidgetState extends State<NavbarWidget> {
+  void _goBranch(int index) {
+    widget.navigationShell.goBranch(
+      index,
+      initialLocation: index == widget.navigationShell.currentIndex,
     );
-    _settingsController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    );
-  }
-
-  @override
-  void dispose() {
-    _wishlistController.dispose();
-    _settingsController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: selectedPageNotifier,
-      builder: (context, selectedPage, child) {
-        return NavigationBar(
-          backgroundColor: Colors.white,
-          indicatorColor: const Color(0xFF6C63FF).withValues(alpha: 0.1),
-          destinations: [
-            const NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home, color: Color(0xFF6C63FF)),
-              label: 'Home',
-            ),
-            NavigationDestination(
-              icon: SizedBox(
-                height: 24,
-                width: 24,
-                child: Lottie.asset(
-                  'lotties/wishlist.json',
-                  controller: _wishlistController,
-                  onLoaded: (composition) {
-                    _wishlistController.duration = composition.duration;
-                    if (selectedPage == 1) {
-                      _wishlistController.forward(from: 1.0);
-                    }
-                  },
-                ),
-              ),
-              label: 'Wishlist',
-            ),
-            NavigationDestination(
-              icon: SizedBox(
-                height: 24,
-                width: 24,
-                child: Lottie.asset(
-                  'lotties/settings.json',
-                  controller: _settingsController,
-                  onLoaded: (composition) {
-                    _settingsController.duration = composition.duration;
-                    if (selectedPage == 2) {
-                      _settingsController.forward(from: 1.0);
-                    }
-                  },
-                ),
-              ),
-              label: 'Settings',
-            ),
-          ],
-          onDestinationSelected: (int value) {
-            
-            if (value == 1) {
-              _wishlistController.forward(from: 0.0);
-            } else if (selectedPage == 1) {
-              _wishlistController.reverse(from: 1.0);
-            }
-
-            if (value == 2) {
-              _settingsController.forward(from: 0.0);
-            } else if (selectedPage == 2) {
-              _settingsController.reverse(from: 1.0);
-            }
-
-            selectedPageNotifier.value = value;
-          },
-          selectedIndex: selectedPage,
-        );
-      },
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: BottomNavigationBar(
+        currentIndex: widget.navigationShell.currentIndex,
+        onTap: _goBranch,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
+        type: BottomNavigationBarType.fixed,
+        elevation: 0,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite_outline),
+            activeIcon: Icon(Icons.favorite),
+            label: 'Wishlist',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings_outlined),
+            activeIcon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+      ),
     );
   }
 }
