@@ -16,6 +16,23 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   final ApiService _apiService = ApiService();
   final WishlistService _wishlistService = WishlistService();
   late Future<List<Product>> _productsFuture;
+  late Future<List<String>> _categoriesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _productsFuture = _apiService.getProducts();
+    _categoriesFuture = _apiService.getCategories();
+  }
+
+  Future<void> _handleRefresh() async {
+    setState(() {
+      _productsFuture = _apiService.getProducts();
+      _categoriesFuture = _apiService.getCategories();
+    });
+    await Future.wait([_productsFuture, _categoriesFuture]);
+  }
+
   late final Future<List<String>> _categoriesFuture =
       _apiService.getCategories();
 
@@ -161,6 +178,18 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 
   Widget _buildProductGrid() {
+    return RefreshIndicator(
+      onRefresh: _handleRefresh,
+      child: FutureBuilder<List<Product>>(
+        future: _productsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
     return FutureBuilder<List<Product>>(
       future: _productsFuture,
       builder: (context, snapshot) {
@@ -185,34 +214,72 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
-                const SizedBox(height: 16),
-                Text(
-                  'Geen resultaten voor "$_searchQuery"',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                Center(child: Text('Fout: ${snapshot.error}')),
+              ],
+            );
+          }
+
+          final allProducts = snapshot.data ?? [];
+          if (allProducts.isEmpty) {
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                const Center(child: Text('Geen producten gevonden.')),
+              ],
+            );
+          }
+
+          final products = allProducts.where((p) {
+            final matchesSearch = p.title
+                    .toLowerCase()
+                    .contains(_searchQuery.toLowerCase()) ||
+                p.category.toLowerCase().contains(_searchQuery.toLowerCase());
+            final matchesCategory =
+                _selectedCategory == 'Alle' || p.category == _selectedCategory;
+            return matchesSearch && matchesCategory;
+          }).toList();
+
+          if (products.isEmpty) {
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+                Center(
+                  child: Column(
+                    children: [
+                      Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Geen resultaten voor "$_searchQuery"',
+                        style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                      ),
+                    ],
+                  ),
                 ),
               ],
-            ),
-          );
-        }
-
-        return GridView.builder(
-          padding: const EdgeInsets.all(16),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.7,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-          ),
-          itemCount: products.length,
-          itemBuilder: (context, index) {
-            return ProductCard(
-              product: products[index],
-              wishlistService: _wishlistService,
             );
-          },
-        );
-      },
+          }
+
+          return GridView.builder(
+            padding: const EdgeInsets.all(16),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.7,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+            ),
+            itemCount: products.length,
+            itemBuilder: (context, index) {
+              return ProductCard(
+                product: products[index],
+                wishlistService: _wishlistService,
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

@@ -1,16 +1,6 @@
 # fake_store
 
-A new Flutter project.
+De fake store is een app waarin je producten kan bestellen/favouriten en bekijken. Je kan dingen kopen zoals SD cards, armbanden, kleding enzovoort.
 
-## Getting Started
+Als statemanagment hebben wij vooral local state gebruikt en built in state managment van flutter zo gebruikte we valuenotifier + hive voor persistente opslag en hadden wen eigenljk gewoon vanilla flutter gebruikt zonder andere statemanagment.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
