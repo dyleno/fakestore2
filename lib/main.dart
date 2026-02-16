@@ -10,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/discover_screen.dart';
+import 'screens/privacy_policy_screen.dart';
+import 'screens/terms_of_service_screen.dart';
 import 'screens/routernav.dart';
 import 'models/product.dart';
 import 'models/cart_item.dart';
@@ -86,6 +88,16 @@ class _MyAppState extends State<MyApp> {
             final product = state.extra as Product;
             return ChatScreen(product: product);
           },
+        ),
+        GoRoute(
+          path: '/privacy-policy',
+          parentNavigatorKey: _rootNavigatorKey,
+          builder: (context, state) => const PrivacyPolicyScreen(),
+        ),
+        GoRoute(
+          path: '/terms-of-service',
+          parentNavigatorKey: _rootNavigatorKey,
+          builder: (context, state) => const TermsOfServiceScreen(),
         ),
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
