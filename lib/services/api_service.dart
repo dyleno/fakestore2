@@ -7,20 +7,27 @@ class ApiService {
   static const String _baseUrl = 'https://fakestoreapi.com';
   static const String _boxName = 'productsBox';
 
-  Future<List<Product>> getProducts() async {
+  Future<List<Product>> getProducts({String? category}) async {
     final box = Hive.box<Product>(_boxName);
 
     try {
-      final response = await http.get(Uri.parse('$_baseUrl/products'));
+      final url = category != null && category != 'Alle'
+          ? '$_baseUrl/products/category/$category'
+          : '$_baseUrl/products';
+
+      final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
-        List<Product> products = 
+        List<Product> products =
             jsonResponse.map((data) => Product.fromJson(data)).toList();
 
-        await box.clear();
-        for (var product in products) {
-          await box.put(product.id, product);
+        // Only clear and update cache for "All" products to avoid partial cache issues
+        if (category == null || category == 'Alle') {
+          await box.clear();
+          for (var product in products) {
+            await box.put(product.id, product);
+          }
         }
 
         return products;
@@ -29,7 +36,11 @@ class ApiService {
       }
     } catch (e) {
       if (box.isNotEmpty) {
-        return box.values.toList();
+        final products = box.values.toList();
+        if (category != null && category != 'Alle') {
+          return products.where((p) => p.category == category).toList();
+        }
+        return products;
       }
       rethrow;
     }
@@ -37,7 +48,8 @@ class ApiService {
 
   Future<List<String>> getCategories() async {
     try {
-      final response = await http.get(Uri.parse('$_baseUrl/products/categories'));
+      final response =
+          await http.get(Uri.parse('$_baseUrl/products/categories'));
       if (response.statusCode == 200) {
         return List<String>.from(json.decode(response.body));
       } else {

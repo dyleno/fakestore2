@@ -27,10 +27,17 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   Future<void> _handleRefresh() async {
     setState(() {
-      _productsFuture = _apiService.getProducts();
+      _productsFuture = _apiService.getProducts(category: _selectedCategory);
       _categoriesFuture = _apiService.getCategories();
     });
     await Future.wait([_productsFuture, _categoriesFuture]);
+  }
+
+  void _onCategorySelected(String category) {
+    setState(() {
+      _selectedCategory = category;
+      _productsFuture = _apiService.getProducts(category: category);
+    });
   }
 
   String _selectedCategory = 'Alle';
@@ -136,9 +143,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   ),
                   selected: isSelected,
                   onSelected: (selected) {
-                    setState(() {
-                      _selectedCategory = category;
-                    });
+                    if (selected) {
+                      _onCategorySelected(category);
+                    }
                   },
                   backgroundColor: Colors.grey[100],
                   selectedColor: const Color(0xFF6C63FF),
@@ -196,6 +203,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     .toLowerCase()
                     .contains(_searchQuery.toLowerCase()) ||
                 p.category.toLowerCase().contains(_searchQuery.toLowerCase());
+            // Server-side filtering handle by _productsFuture, local filtering handles 'Alle' or edge cases
             final matchesCategory =
                 _selectedCategory == 'Alle' || p.category == _selectedCategory;
             return matchesSearch && matchesCategory;
