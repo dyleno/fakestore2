@@ -229,7 +229,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: showIconBackground
-                      ? iconColor?.withOpacity(0.1)
+                      ? iconColor?.withValues(alpha: 0.1)
                       : Colors.transparent,
                   shape: BoxShape.circle,
                 ),

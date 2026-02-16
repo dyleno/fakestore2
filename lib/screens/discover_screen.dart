@@ -15,9 +15,22 @@ class DiscoverScreen extends StatefulWidget {
 class _DiscoverScreenState extends State<DiscoverScreen> {
   final ApiService _apiService = ApiService();
   final WishlistService _wishlistService = WishlistService();
-  late final Future<List<Product>> _productsFuture = _apiService.getProducts();
+  late Future<List<Product>> _productsFuture;
   late final Future<List<String>> _categoriesFuture =
       _apiService.getCategories();
+
+  @override
+  void initState() {
+    super.initState();
+    _productsFuture = _apiService.getProducts();
+  }
+
+  void _onCategorySelected(String category) {
+    setState(() {
+      _selectedCategory = category;
+      _productsFuture = _apiService.getProducts(category: category);
+    });
+  }
 
   // Filter state
   String _selectedCategory = 'Alle';
@@ -123,9 +136,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   ),
                   selected: isSelected,
                   onSelected: (selected) {
-                    setState(() {
-                      _selectedCategory = category;
-                    });
+                    if (selected) {
+                      _onCategorySelected(category);
+                    }
                   },
                   backgroundColor: Colors.grey[100],
                   selectedColor: const Color(0xFF6C63FF),
@@ -164,9 +177,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           final matchesSearch =
               p.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
                   p.category.toLowerCase().contains(_searchQuery.toLowerCase());
-          final matchesCategory =
-              _selectedCategory == 'Alle' || p.category == _selectedCategory;
-          return matchesSearch && matchesCategory;
+          return matchesSearch;
         }).toList();
 
         if (products.isEmpty && _searchQuery.isNotEmpty) {
