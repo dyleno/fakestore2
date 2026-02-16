@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import '../models/product.dart';
 import '../services/wishlist_service.dart';
 import '../services/cart_service.dart';
+import '../language_provider.dart';
+import '../translations.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -45,38 +47,45 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: CustomScrollView(
-        slivers: [
-          _buildAppBar(),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildTitleAndPrice(),
-                  const SizedBox(height: 16),
-                  _buildRating(),
-                  const SizedBox(height: 24),
-                  _buildColorSelection(),
-                  const SizedBox(height: 24),
-                  _buildSizeSelection(),
-                  const SizedBox(height: 24),
-                  _buildDescription(),
-                  const SizedBox(height: 24),
-                  _buildSpecs(),
-                  const SizedBox(height: 32),
-                  _buildReviews(),
-                  const SizedBox(height: 100),
-                ],
+    return ValueListenableBuilder<AppLanguage>(
+      valueListenable: LanguageProvider(),
+      builder: (context, language, _) {
+        final t = Translations.get(language);
+
+        return Scaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          body: CustomScrollView(
+            slivers: [
+              _buildAppBar(),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildTitleAndPrice(),
+                      const SizedBox(height: 16),
+                      _buildRating(t),
+                      const SizedBox(height: 24),
+                      _buildColorSelection(t),
+                      const SizedBox(height: 24),
+                      _buildSizeSelection(t),
+                      const SizedBox(height: 24),
+                      _buildDescription(t),
+                      const SizedBox(height: 24),
+                      _buildSpecs(t),
+                      const SizedBox(height: 32),
+                      _buildReviews(t),
+                      const SizedBox(height: 100),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-      bottomSheet: _buildBottomBar(),
+          bottomSheet: _buildBottomBar(t),
+        );
+      },
     );
   }
 
@@ -172,7 +181,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildRating() {
+  Widget _buildRating(Map<String, String> t) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -195,7 +204,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ),
             const SizedBox(width: 8),
             Text(
-              '•  ${widget.product.ratingCount} reviews',
+              '•  ${widget.product.ratingCount} ${t['product_reviews']!}',
               style: TextStyle(color: Colors.grey[600], fontSize: 14),
             ),
           ],
@@ -204,13 +213,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildColorSelection() {
+  Widget _buildColorSelection(Map<String, String> t) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'SELECTEER KLEUR',
-          style: TextStyle(
+        Text(
+          t['product_select_color']!,
+          style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w900,
             color: Colors.grey,
@@ -259,7 +268,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildSizeSelection() {
+  Widget _buildSizeSelection(Map<String, String> t) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,9 +276,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'MAAT',
-              style: TextStyle(
+            Text(
+              t['product_size']!,
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w900,
                 color: Colors.grey,
@@ -277,10 +286,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ),
             TextButton(
-              onPressed: () => _showSizeGuide(context),
-              child: const Text(
-                'Size Guide',
-                style: TextStyle(
+              onPressed: () => _showSizeGuide(context, t),
+              child: Text(
+                t['product_size_guide']!,
+                style: const TextStyle(
                     color: Color(0xFF6C63FF), fontWeight: FontWeight.bold),
               ),
             ),
@@ -323,7 +332,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  void _showSizeGuide(BuildContext context) {
+  void _showSizeGuide(BuildContext context, Map<String, String> t) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
@@ -361,7 +370,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Size Guide',
+                        t['product_size_guide_title']!,
                         style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -375,12 +384,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Alle afmetingen zijn in centimeters (cm).',
+                    t['product_size_guide_subtitle']!,
                     style: TextStyle(
                         color: isDark ? Colors.white60 : Colors.grey[600]),
                   ),
                   const SizedBox(height: 24),
-                  _buildSizeTable(),
+                  _buildSizeTable(t),
                   const SizedBox(height: 32),
                   SizedBox(
                     width: double.infinity,
@@ -393,7 +402,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: const Text('Sluiten'),
+                      child: Text(t['product_size_guide_close']!),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -406,7 +415,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildSizeTable() {
+  Widget _buildSizeTable(Map<String, String> t) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isClothing =
         widget.product.category.toLowerCase().contains('clothing');
@@ -419,7 +428,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          'Voor dit product is geen specifieke maattabel beschikbaar. Het betreft een \'Universal\' maat.',
+          t['product_size_guide_no_table']!,
           style: TextStyle(
               fontStyle: FontStyle.italic,
               color: isDark ? Colors.white70 : Colors.black),
@@ -432,7 +441,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           inside:
               BorderSide(color: isDark ? Colors.white10 : Colors.grey[200]!)),
       children: [
-        _buildTableRow(['Maat', 'Borst', 'Lengte'], isHeader: true),
+        _buildTableRow([
+          t['product_size_table_size']!,
+          t['product_size_table_chest']!,
+          t['product_size_table_length']!
+        ], isHeader: true, t: t),
         _buildTableRow(['S', '92-96', '68-70']),
         _buildTableRow(['M', '96-100', '70-72']),
         _buildTableRow(['L', '100-104', '72-74']),
@@ -442,7 +455,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  TableRow _buildTableRow(List<String> cells, {bool isHeader = false}) {
+  TableRow _buildTableRow(List<String> cells,
+      {bool isHeader = false, Map<String, String>? t}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return TableRow(
       children: cells.map((cell) {
@@ -463,13 +477,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildDescription() {
+  Widget _buildDescription(Map<String, String> t) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Beschrijving',
+          t['product_description']!,
           style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -488,17 +502,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildSpecs() {
+  Widget _buildSpecs(Map<String, String> t) {
     return Row(
       children: [
-        _buildSpecItem(Icons.info_outline, 'SPECS', 'Hoogwaardig'),
+        _buildSpecItem(Icons.info_outline, t['product_specs_title']!,
+            t['product_specs_quality']!, t),
         const SizedBox(width: 16),
-        _buildSpecItem(Icons.verified_user_outlined, 'GARANTIE', '2 Jaar'),
+        _buildSpecItem(
+            Icons.verified_user_outlined,
+            t['product_specs_warranty']!,
+            t['product_specs_warranty_value']!,
+            t),
       ],
     );
   }
 
-  Widget _buildSpecItem(IconData icon, String title, String value) {
+  Widget _buildSpecItem(
+      IconData icon, String title, String value, Map<String, String> t) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Expanded(
       child: Container(
@@ -535,7 +555,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildBottomBar() {
+  Widget _buildBottomBar(Map<String, String> t) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(20),
@@ -580,8 +600,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         : null,
                   );
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Toegevoegd aan mandjes! 🛍️'),
+                    SnackBar(
+                      content: Text(t['product_added_to_cart']!),
                       behavior: SnackBarBehavior.floating,
                     ),
                   );
@@ -594,15 +614,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.shopping_bag_outlined, size: 20),
-                    SizedBox(width: 12),
+                    const Icon(Icons.shopping_bag_outlined, size: 20),
+                    const SizedBox(width: 12),
                     Text(
-                      'In mijn mandje',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      t['product_add_to_cart']!,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -614,7 +634,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildReviews() {
+  Widget _buildReviews(Map<String, String> t) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -622,7 +642,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Reviews',
+              t['product_reviews_title']!,
               style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -631,8 +651,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       : Colors.black),
             ),
             Text(
-              'Bekijk alles',
-              style: TextStyle(
+              t['product_reviews_view_all']!,
+              style: const TextStyle(
                   color: Color(0xFF6C63FF), fontWeight: FontWeight.bold),
             ),
           ],

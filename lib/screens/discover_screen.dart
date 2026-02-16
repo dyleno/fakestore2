@@ -4,6 +4,8 @@ import '../models/product.dart';
 import '../services/api_service.dart';
 import '../services/wishlist_service.dart';
 import '../widgets/product_card.dart';
+import '../language_provider.dart';
+import '../translations.dart';
 
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({super.key});
@@ -41,7 +43,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 
   // Filter state
-  String _selectedCategory = 'Alle';
+  String _selectedCategory = 'all';
 
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -53,72 +55,84 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     super.dispose();
   }
 
+  String _translateCategory(String category, Map<String, String> t) {
+    if (category == 'all') return t['category_all']!;
+    return t['category_$category'] ?? category;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: _isSearching
-            ? TextField(
-                controller: _searchController,
-                autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Zoek producten...',
-                  border: InputBorder.none,
-                  hintStyle: TextStyle(color: Colors.grey),
-                ),
-                style: const TextStyle(fontSize: 18),
-                onChanged: (value) {
+    return ValueListenableBuilder<AppLanguage>(
+      valueListenable: LanguageProvider(),
+      builder: (context, language, _) {
+        final t = Translations.get(language);
+
+        return Scaffold(
+          appBar: AppBar(
+            title: _isSearching
+                ? TextField(
+                    controller: _searchController,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: t['discover_search']!,
+                      border: InputBorder.none,
+                      hintStyle: const TextStyle(color: Colors.grey),
+                    ),
+                    style: const TextStyle(fontSize: 18),
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                    },
+                  )
+                : Text(
+                    t['discover_title']!,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 24,
+                        letterSpacing: -0.5),
+                  ),
+            actions: [
+              IconButton(
+                icon: Icon(_isSearching ? Icons.close : Icons.search),
+                onPressed: () {
                   setState(() {
-                    _searchQuery = value;
+                    if (_isSearching) {
+                      _isSearching = false;
+                      _searchController.clear();
+                      _searchQuery = '';
+                    } else {
+                      _isSearching = true;
+                    }
                   });
                 },
-              )
-            : const Text(
-                'Ontdek Shop',
-                style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 24,
-                    letterSpacing: -0.5),
               ),
-        actions: [
-          IconButton(
-            icon: Icon(_isSearching ? Icons.close : Icons.search),
-            onPressed: () {
-              setState(() {
-                if (_isSearching) {
-                  _isSearching = false;
-                  _searchController.clear();
-                  _searchQuery = '';
-                } else {
-                  _isSearching = true;
-                }
-              });
-            },
+              IconButton(
+                icon: const Icon(Icons.shopping_cart_outlined),
+                onPressed: () {
+                  context.push('/cart');
+                },
+              ),
+            ],
           ),
-          IconButton(
-            icon: const Icon(Icons.shopping_bag_outlined),
-            onPressed: () {
-              context.push('/cart');
-            },
+          body: Column(
+            children: [
+              _buildCategoryFilter(t),
+              Expanded(child: _buildProductGrid(t)),
+            ],
           ),
-        ],
-      ),
-      body: Column(
-        children: [
-          _buildCategoryFilter(),
-          Expanded(child: _buildProductGrid()),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildCategoryFilter() {
+  Widget _buildCategoryFilter(Map<String, String> t) {
     return FutureBuilder<List<String>>(
       future: _categoriesFuture,
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const SizedBox.shrink();
 
-        final categories = ['Alle', ...snapshot.data!];
+        final categories = ['all', ...snapshot.data!];
 
         return Container(
           height: 60,
@@ -130,12 +144,13 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             itemBuilder: (context, index) {
               final category = categories[index];
               final isSelected = _selectedCategory == category;
+              final displayName = _translateCategory(category, t);
 
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: FilterChip(
                   label: Text(
-                    category[0].toUpperCase() + category.substring(1),
+                    displayName,
                     style: TextStyle(
                       color: isSelected ? Colors.white : Colors.black87,
                       fontWeight:
@@ -168,7 +183,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     );
   }
 
-  Widget _buildProductGrid() {
+  Widget _buildProductGrid(Map<String, String> t) {
     return RefreshIndicator(
       onRefresh: _handleRefresh,
       child: FutureBuilder<List<Product>>(
@@ -183,7 +198,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
                 SizedBox(height: MediaQuery.of(context).size.height * 0.3),
-                Center(child: Text('Fout: ${snapshot.error}')),
+                Center(
+                    child: Text('${t['discover_error']}: ${snapshot.error}')),
               ],
             );
           }
@@ -194,7 +210,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
                 SizedBox(height: MediaQuery.of(context).size.height * 0.3),
-                const Center(child: Text('Geen producten gevonden.')),
+                Center(child: Text(t['discover_no_products']!)),
               ],
             );
           }
@@ -204,9 +220,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     .toLowerCase()
                     .contains(_searchQuery.toLowerCase()) ||
                 p.category.toLowerCase().contains(_searchQuery.toLowerCase());
-            // Server-side filtering handle by _productsFuture, local filtering handles 'Alle' or edge cases
             final matchesCategory =
-                _selectedCategory == 'Alle' || p.category == _selectedCategory;
+                _selectedCategory == 'all' || p.category == _selectedCategory;
             return matchesSearch && matchesCategory;
           }).toList();
 
@@ -221,7 +236,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
                       const SizedBox(height: 16),
                       Text(
-                        'Geen resultaten voor "$_searchQuery"',
+                        '${t['discover_no_products']} "$_searchQuery"',
                         style: TextStyle(color: Colors.grey[600], fontSize: 16),
                       ),
                     ],
