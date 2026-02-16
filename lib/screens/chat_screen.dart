@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/product.dart';
+import '../services/ai_service.dart';
 
 class ChatScreen extends StatefulWidget {
   final Product product;
@@ -14,13 +15,14 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final List<Map<String, dynamic>> _messages = [];
   bool _isTyping = false;
+  final AiService _aiService = AiService();
 
   @override
   void initState() {
     super.initState();
     _messages.add({
       'text':
-          'Hoi! Ik ben de ShopAI assistant. Ik zie dat je kijkt naar de ${widget.product.title}. Heb je daar vragen over?',
+          'Hoi! Ik ben de ShopAI assistant. Ik zie dat je kijkt naar de ${widget.product.title}. Heb je daar specifieke vragen over?',
       'isUser': false,
     });
   }
@@ -36,33 +38,14 @@ class _ChatScreenState extends State<ChatScreen> {
       _isTyping = true;
     });
 
-    // Simuleer een AI antwoord
-    await Future.delayed(const Duration(seconds: 2));
-
-    String aiResponse = _generateResponse(userText);
+    // We roepen nu de echte AI Service aan (Gemini)
+    final aiResponse = await _aiService.getResponse(userText, widget.product);
 
     if (mounted) {
       setState(() {
         _isTyping = false;
         _messages.add({'text': aiResponse, 'isUser': false});
       });
-    }
-  }
-
-  String _generateResponse(String input) {
-    input = input.toLowerCase();
-    if (input.contains('prijs') ||
-        input.contains('duur') ||
-        input.contains('kosten')) {
-      return 'De huidige prijs van dit product is €${widget.product.price.toStringAsFixed(2)}. Een top deal voor deze kwaliteit!';
-    } else if (input.contains('maat') || input.contains('groot')) {
-      return 'Voor dit product hebben we verschillende maten beschikbaar. Check de Size Guide voor de exacte afmetingen!';
-    } else if (input.contains('levering') || input.contains('bezorgen')) {
-      return 'Als je vandaag bestelt, heb je het meestal binnen 1-2 werkdagen in huis!';
-    } else if (input.contains('kleur')) {
-      return 'We hebben momenteel verschillende kleuropties. De filter op de pagina laat je zien hoe ze eruit zien!';
-    } else {
-      return 'Dat is een goede vraag over de ${widget.product.title}! Onze klanten zijn er erg tevreden over, vooral vanwege de ${widget.product.category}. Kan ik je nog ergens anders mee helpen?';
     }
   }
 
@@ -109,7 +92,7 @@ class _ChatScreenState extends State<ChatScreen> {
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
-                  Text('AI is aan het typen...',
+                  Text('AI is aan het nadenken...',
                       style: TextStyle(
                           fontStyle: FontStyle.italic, color: Colors.grey)),
                 ],
@@ -162,7 +145,7 @@ class _ChatScreenState extends State<ChatScreen> {
               child: TextField(
                 controller: _controller,
                 decoration: InputDecoration(
-                  hintText: 'Stel een vraag...',
+                  hintText: 'Stel een vraag aan de AI...',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
                     borderSide: BorderSide.none,

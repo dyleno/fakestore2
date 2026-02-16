@@ -1,7 +1,10 @@
 import 'package:fake_store/services/cart_service.dart';
 import 'package:fake_store/services/wishlist_service.dart';
+import 'package:fake_store/services/order_service.dart';
+import 'package:fake_store/models/order.dart';
 import 'package:fake_store/theme_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -52,7 +55,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         themeProvider
                             .setTheme(val ? ThemeMode.dark : ThemeMode.light);
                       },
-                      activeThumbColor: const Color(0xFF6C63FF),
+                      activeColor: const Color(0xFF6C63FF),
                     ),
                     onTap: () {
                       themeProvider.toggleTheme();
@@ -61,6 +64,79 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
             ],
+          ),
+          const SizedBox(height: 24),
+          _buildSectionHeader('RECENTE AANKOPEN'),
+          ValueListenableBuilder<List<Order>>(
+            valueListenable: OrderService().ordersNotifier,
+            builder: (context, orders, _) {
+              if (orders.isEmpty) {
+                return _buildSettingsCard(
+                  isDark: isDark,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Icon(Icons.shopping_bag_outlined,
+                                color: Colors.grey.withOpacity(0.5), size: 32),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Nog geen bestellingen',
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              return Column(
+                children: orders.take(3).map((order) {
+                  return Column(
+                    children: [
+                      _buildSettingsCard(
+                        isDark: isDark,
+                        children: [
+                          _buildSettingsItem(
+                            icon: Icons.receipt_long_outlined,
+                            iconColor: const Color(0xFF6C63FF),
+                            title:
+                                'Bestelling #${order.id.substring(order.id.length - 5)}',
+                            isDark: isDark,
+                            trailing: Text(
+                              '€${order.totalAmount.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF6C63FF),
+                              ),
+                            ),
+                            onTap: () {
+                              _showOrderDetails(context, order, isDark);
+                            },
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 56, bottom: 12),
+                            child: Text(
+                              DateFormat('dd MMM yyyy, HH:mm')
+                                  .format(order.date),
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                  );
+                }).toList(),
+              );
+            },
           ),
           const SizedBox(height: 24),
           _buildSectionHeader('DATA & STORAGE'),
@@ -102,15 +178,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                   WishlistService().clearWishlist();
                   CartService().clearCart();
+                  OrderService().clearOrders();
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Row(
+                      content: const Row(
                         children: [
-                          const Icon(Icons.check_circle_outline,
-                              color: Colors.white),
-                          const SizedBox(width: 12),
-                          const Text('Cache, Theme & Wishlist cleared'),
+                          Icon(Icons.check_circle_outline, color: Colors.white),
+                          SizedBox(width: 12),
+                          Text('Cache, Theme & Wishlist cleared'),
                         ],
                       ),
                       backgroundColor: Colors.green.shade800,
@@ -285,6 +361,79 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         const SizedBox(height: 32),
       ],
+    );
+  }
+
+  void _showOrderDetails(BuildContext context, Order order, bool isDark) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Bestelling Details',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ...order.items.map((item) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${item.quantity}x ${item.product.title}',
+                            style: TextStyle(
+                                color:
+                                    isDark ? Colors.white70 : Colors.black87),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Text(
+                          '€${(item.product.price * item.quantity).toStringAsFixed(2)}',
+                          style: TextStyle(
+                              color: isDark ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  )),
+              const Divider(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Totaal',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  Text(
+                    '€${order.totalAmount.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 18,
+                      color: Color(0xFF6C63FF),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
     );
   }
 }

@@ -13,6 +13,8 @@ import 'screens/discover_screen.dart';
 import 'screens/routernav.dart';
 import 'models/product.dart';
 import 'models/cart_item.dart';
+import 'models/order.dart';
+import 'services/order_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,9 +25,13 @@ void main() async {
   if (!Hive.isAdapterRegistered(1)) {
     Hive.registerAdapter(CartItemAdapter());
   }
+  if (!Hive.isAdapterRegistered(2)) {
+    Hive.registerAdapter(OrderAdapter());
+  }
   await Hive.openBox<Product>('productsBox');
   await Hive.openBox<Product>('wishlistBox');
   await Hive.openBox<CartItem>('cartBox');
+  await OrderService().init();
 
   final prefs = await SharedPreferences.getInstance();
   final bool onboardingCompleted =

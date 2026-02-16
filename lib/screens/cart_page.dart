@@ -1,5 +1,7 @@
 import 'package:fake_store/models/cart_item.dart';
 import 'package:fake_store/services/cart_service.dart';
+import 'package:fake_store/models/order.dart';
+import 'package:fake_store/services/order_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -254,14 +256,29 @@ class CartPage extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Bestelling geplaatst! 🚀'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
+                onPressed: () async {
+                  final cartItems =
+                      List<CartItem>.from(cartService.cartNotifier.value);
+                  if (cartItems.isEmpty) return;
+
+                  final newOrder = Order(
+                    id: DateTime.now().millisecondsSinceEpoch.toString(),
+                    items: cartItems,
+                    totalAmount: cartService.totalAmount,
+                    date: DateTime.now(),
                   );
-                  cartService.clearCart();
+
+                  await OrderService().addOrder(newOrder);
+
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Bestelling geplaatst! 🚀'),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                    cartService.clearCart();
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF6C63FF),
