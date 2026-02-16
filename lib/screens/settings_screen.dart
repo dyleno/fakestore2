@@ -5,6 +5,7 @@ import 'package:fake_store/models/order.dart';
 import 'package:fake_store/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -235,7 +236,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 trailing: const Icon(Icons.chevron_right,
                     color: Colors.grey, size: 20),
                 showIconBackground: false,
-                onTap: () {},
+                onTap: () {
+                  context.push('/privacy-policy');
+                },
               ),
               Divider(
                   height: 1,
@@ -247,7 +250,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 trailing: const Icon(Icons.chevron_right,
                     color: Colors.grey, size: 20),
                 showIconBackground: false,
-                onTap: () {},
+                onTap: () {
+                  context.push('/terms-of-service');
+                },
               ),
             ],
           ),
