@@ -70,6 +70,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           themeProvider.toggleTheme();
                         },
                       );
+              ValueListenableBuilder<ThemeMode>(
+                valueListenable: themeProvider,
+                builder: (context, themeMode, _) {
+                  return _buildSettingsItem(
+                    icon: Icons.dark_mode_outlined,
+                    iconColor: const Color(0xFF6C63FF),
+                    title: 'Dark Mode',
+                    isDark: isDark,
+                    trailing: Switch(
+                      value: themeMode == ThemeMode.dark,
+                      onChanged: (bool val) {
+                        themeProvider
+                            .setTheme(val ? ThemeMode.dark : ThemeMode.light);
+                      },
+                      activeColor: const Color(0xFF6C63FF),
+                    ),
+                    onTap: () {
+                      themeProvider.toggleTheme();
                     },
                   ),
                   Divider(
@@ -273,6 +291,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                   ),
                 ],
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Row(
+                        children: [
+                          Icon(Icons.check_circle_outline, color: Colors.white),
+                          SizedBox(width: 12),
+                          Text('Cache, Theme & Wishlist cleared'),
+                        ],
+                      ),
+                      backgroundColor: Colors.green.shade800,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                },
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 16, top: 8, right: 16),
@@ -385,7 +421,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: showIconBackground
-                      ? iconColor?.withValues(alpha: 0.1)
+                      ? iconColor?.withOpacity(0.1)
                       : Colors.transparent,
                   shape: BoxShape.circle,
                 ),
