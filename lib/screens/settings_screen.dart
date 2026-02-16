@@ -42,27 +42,94 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildSettingsCard(
             isDark: isDark,
             children: [
-              ValueListenableBuilder<ThemeMode>(
-                valueListenable: themeProvider,
-                builder: (context, themeMode, _) {
-                  return _buildSettingsItem(
-                    icon: Icons.dark_mode_outlined,
-                    iconColor: const Color(0xFF6C63FF),
-                    title: 'Dark Mode',
-                    isDark: isDark,
-                    trailing: Switch(
-                      value: themeMode == ThemeMode.dark,
-                      onChanged: (bool val) {
-                        themeProvider
-                            .setTheme(val ? ThemeMode.dark : ThemeMode.light);
-                      },
-                      activeColor: const Color(0xFF6C63FF),
-                    ),
-                    onTap: () {
-                      themeProvider.toggleTheme();
+              _buildSectionHeader(t['settings_appearance']!),
+              _buildSettingsCard(
+                isDark: isDark,
+                children: [
+                  ValueListenableBuilder<ThemeMode>(
+                    valueListenable: themeProvider,
+                    builder: (context, themeMode, _) {
+                      return _buildSettingsItem(
+                        icon: Icons.dark_mode_outlined,
+                        iconColor: const Color(0xFF6C63FF),
+                        title: t['settings_dark_mode']!,
+                        isDark: isDark,
+                        trailing: Switch(
+                          value: themeMode == ThemeMode.dark,
+                          onChanged: (bool val) {
+                            themeProvider.setTheme(
+                                val ? ThemeMode.dark : ThemeMode.light);
+                          },
+                          activeColor: const Color(0xFF6C63FF),
+                        ),
+                        onTap: () {
+                          themeProvider.toggleTheme();
+                        },
+                      );
                     },
-                  );
-                },
+                  ),
+                  Divider(
+                      height: 1,
+                      indent: 56,
+                      color: isDark ? Colors.white10 : Colors.black12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF6C63FF).withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.language_outlined,
+                              color: Color(0xFF6C63FF), size: 22),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            t['settings_language']!,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? Colors.white.withOpacity(0.1)
+                                : Colors.grey.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildLanguageButton(
+                                'NL',
+                                AppLanguage.dutch,
+                                language,
+                                languageProvider,
+                                isDark,
+                                isFirst: true,
+                              ),
+                              _buildLanguageButton(
+                                'EN',
+                                AppLanguage.english,
+                                language,
+                                languageProvider,
+                                isDark,
+                                isLast: true,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -181,24 +248,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   CartService().clearCart();
                   OrderService().clearOrders();
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Row(
-                        children: [
-                          Icon(Icons.check_circle_outline, color: Colors.white),
-                          SizedBox(width: 12),
-                          Text('Cache, Theme & Wishlist cleared'),
-                        ],
-                      ),
-                      backgroundColor: Colors.green.shade800,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-                },
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              const Icon(Icons.check_circle_outline,
+                                  color: Colors.white),
+                              const SizedBox(width: 12),
+                              Text(t['settings_cache_cleared']!),
+                            ],
+                          ),
+                          backgroundColor: Colors.green.shade800,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -358,13 +428,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         const SizedBox(height: 4),
         const Text(
-          '© 2024 Commerce Inc.',
+          'v2.1.0',
           style: TextStyle(
             fontSize: 12,
             color: Colors.grey,
           ),
         ),
-        const SizedBox(height: 32),
       ],
     );
   }
@@ -372,51 +441,78 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _showOrderDetails(BuildContext context, Order order, bool isDark) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(24.0),
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.7,
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.all(24),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Bestelling Details',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    t['settings_order_details']!,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+              const Divider(),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: order.items.length,
+                  itemBuilder: (context, index) {
+                    final item = order.items[index];
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Image.network(item.product.image),
+                      ),
+                      title: Text(
+                        item.product.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      subtitle: Text(
+                        '${item.quantity}x €${item.product.price.toStringAsFixed(2)}',
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                      trailing: Text(
+                        '€${(item.product.price * item.quantity).toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-              const SizedBox(height: 16),
-              ...order.items.map((item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '${item.quantity}x ${item.product.title}',
-                            style: TextStyle(
-                                color:
-                                    isDark ? Colors.white70 : Colors.black87),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Text(
-                          '€${(item.product.price * item.quantity).toStringAsFixed(2)}',
-                          style: TextStyle(
-                              color: isDark ? Colors.white : Colors.black,
-                              fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                  )),
-              const Divider(height: 32),
+              const Divider(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
