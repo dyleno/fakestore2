@@ -3,8 +3,6 @@ import 'package:fake_store/services/wishlist_service.dart';
 import 'package:fake_store/services/order_service.dart';
 import 'package:fake_store/models/order.dart';
 import 'package:fake_store/theme_provider.dart';
-import 'package:fake_store/language_provider.dart';
-import 'package:fake_store/translations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
@@ -22,29 +20,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = ThemeProvider();
-    final languageProvider = LanguageProvider();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return ValueListenableBuilder<AppLanguage>(
-      valueListenable: languageProvider,
-      builder: (context, language, _) {
-        final t = Translations.get(language);
-
-        return Scaffold(
-          backgroundColor:
-              isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF8F9FA),
-          appBar: AppBar(
-            centerTitle: true,
-            title: Text(
-              t['settings_title']!,
-              style: const TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 18,
-              ),
-            ),
+    return Scaffold(
+      backgroundColor:
+          isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF8F9FA),
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text(
+          'Settings',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 18,
           ),
-          body: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        children: [
+          _buildSectionHeader('APPEARANCE'),
+          _buildSettingsCard(
+            isDark: isDark,
             children: [
               _buildSectionHeader(t['settings_appearance']!),
               _buildSettingsCard(
@@ -135,121 +131,122 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-              _buildSectionHeader(t['settings_recent_orders']!),
-              ValueListenableBuilder<List<Order>>(
-                valueListenable: OrderService().ordersNotifier,
-                builder: (context, orders, _) {
-                  if (orders.isEmpty) {
-                    return _buildSettingsCard(
-                      isDark: isDark,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(24.0),
-                          child: Center(
-                            child: Column(
-                              children: [
-                                Icon(Icons.shopping_bag_outlined,
-                                    color: Colors.grey.withOpacity(0.5),
-                                    size: 32),
-                                const SizedBox(height: 8),
-                                Text(
-                                  t['settings_no_orders']!,
-                                  style: const TextStyle(
-                                      color: Colors.grey, fontSize: 14),
-                                ),
-                              ],
+            ],
+          ),
+          const SizedBox(height: 24),
+          _buildSectionHeader('RECENTE AANKOPEN'),
+          ValueListenableBuilder<List<Order>>(
+            valueListenable: OrderService().ordersNotifier,
+            builder: (context, orders, _) {
+              if (orders.isEmpty) {
+                return _buildSettingsCard(
+                  isDark: isDark,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Icon(Icons.shopping_bag_outlined,
+                                color: Colors.grey.withOpacity(0.5), size: 32),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Nog geen bestellingen',
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              return Column(
+                children: orders.take(3).map((order) {
+                  return Column(
+                    children: [
+                      _buildSettingsCard(
+                        isDark: isDark,
+                        children: [
+                          _buildSettingsItem(
+                            icon: Icons.receipt_long_outlined,
+                            iconColor: const Color(0xFF6C63FF),
+                            title:
+                                'Bestelling #${order.id.substring(order.id.length - 5)}',
+                            isDark: isDark,
+                            trailing: Text(
+                              '€${order.totalAmount.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF6C63FF),
+                              ),
+                            ),
+                            onTap: () {
+                              _showOrderDetails(context, order, isDark);
+                            },
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 56, bottom: 12),
+                            child: Text(
+                              DateFormat('dd MMM yyyy, HH:mm')
+                                  .format(order.date),
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 12),
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  }
-
-                  return Column(
-                    children: orders.take(3).map((order) {
-                      return Column(
-                        children: [
-                          _buildSettingsCard(
-                            isDark: isDark,
-                            children: [
-                              _buildSettingsItem(
-                                icon: Icons.receipt_long_outlined,
-                                iconColor: const Color(0xFF6C63FF),
-                                title:
-                                    '${t['settings_order']!} #${order.id.substring(order.id.length - 5)}',
-                                isDark: isDark,
-                                trailing: Text(
-                                  '€${order.totalAmount.toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF6C63FF),
-                                  ),
-                                ),
-                                onTap: () {
-                                  _showOrderDetails(context, order, isDark, t);
-                                },
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 56, bottom: 12),
-                                child: Text(
-                                  DateFormat('dd MMM yyyy, HH:mm')
-                                      .format(order.date),
-                                  style: const TextStyle(
-                                      color: Colors.grey, fontSize: 12),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
                         ],
-                      );
-                    }).toList(),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
                   );
-                },
-              ),
-              const SizedBox(height: 24),
-              _buildSectionHeader(t['settings_data_storage']!),
-              _buildSettingsCard(
+                }).toList(),
+              );
+            },
+          ),
+          const SizedBox(height: 24),
+          _buildSectionHeader('DATA & STORAGE'),
+          _buildSettingsCard(
+            isDark: isDark,
+            children: [
+              _buildSettingsItem(
+                icon: Icons.cloud_outlined,
+                iconColor: const Color(0xFF6C63FF),
+                title: 'Used Storage',
                 isDark: isDark,
-                children: [
-                  _buildSettingsItem(
-                    icon: Icons.cloud_outlined,
-                    iconColor: const Color(0xFF6C63FF),
-                    title: t['settings_used_storage']!,
-                    isDark: isDark,
-                    trailing: Text(
-                      _storageSize,
-                      style: const TextStyle(color: Colors.grey, fontSize: 14),
-                    ),
-                    onTap: () {},
-                  ),
-                  Divider(
-                      height: 1,
-                      indent: 56,
-                      color: isDark ? Colors.white10 : Colors.black12),
-                  _buildSettingsItem(
-                    icon: Icons.delete_outline,
-                    iconColor: Colors.red,
-                    title: t['settings_clear_cache']!,
-                    titleColor: Colors.red,
-                    isDark: isDark,
-                    trailing: const Icon(Icons.chevron_right,
-                        color: Colors.grey, size: 20),
-                    onTap: () {
-                      PaintingBinding.instance.imageCache.clear();
-                      PaintingBinding.instance.imageCache.clearLiveImages();
+                trailing: Text(
+                  _storageSize,
+                  style: const TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+                onTap: () {},
+              ),
+              Divider(
+                  height: 1,
+                  indent: 56,
+                  color: isDark ? Colors.white10 : Colors.black12),
+              _buildSettingsItem(
+                icon: Icons.delete_outline,
+                iconColor: Colors.red,
+                title: 'Clear Cache',
+                titleColor: Colors.red,
+                isDark: isDark,
+                trailing: const Icon(Icons.chevron_right,
+                    color: Colors.grey, size: 20),
+                onTap: () {
+                  PaintingBinding.instance.imageCache.clear();
+                  PaintingBinding.instance.imageCache.clearLiveImages();
 
-                      setState(() {
-                        _storageSize = '0.0 MB';
-                      });
+                  setState(() {
+                    _storageSize = '0.0 MB';
+                  });
 
-                      ThemeProvider().setTheme(ThemeMode.system);
+                  ThemeProvider().setTheme(ThemeMode.system);
 
-                      WishlistService().clearWishlist();
-                      CartService().clearCart();
-                      OrderService().clearOrders();
+                  WishlistService().clearWishlist();
+                  CartService().clearCart();
+                  OrderService().clearOrders();
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -273,66 +270,65 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 16, top: 8, right: 16),
-                child: Text(
-                  t['settings_cache_warning']!,
-                  style: const TextStyle(
-                      color: Colors.grey, fontSize: 13, height: 1.4),
-                ),
-              ),
-              const SizedBox(height: 24),
-              _buildSectionHeader(t['settings_about']!),
-              _buildSettingsCard(
-                isDark: isDark,
-                children: [
-                  _buildSettingsItem(
-                    icon: Icons.info_outline,
-                    iconColor: Colors.green,
-                    title: t['settings_version']!,
-                    isDark: isDark,
-                    trailing: const Text(
-                      '2.1.0 (Build 402)',
-                      style: TextStyle(color: Colors.grey, fontSize: 14),
-                    ),
-                    onTap: () {},
-                  ),
-                  Divider(
-                      height: 1,
-                      indent: 56,
-                      color: isDark ? Colors.white10 : Colors.black12),
-                  _buildSettingsItem(
-                    title: t['settings_privacy_policy']!,
-                    isDark: isDark,
-                    trailing: const Icon(Icons.chevron_right,
-                        color: Colors.grey, size: 20),
-                    showIconBackground: false,
-                    onTap: () {
-                      context.push('/privacy-policy');
-                    },
-                  ),
-                  Divider(
-                      height: 1,
-                      indent: 16,
-                      color: isDark ? Colors.white10 : Colors.black12),
-                  _buildSettingsItem(
-                    title: t['settings_terms_of_service']!,
-                    isDark: isDark,
-                    trailing: const Icon(Icons.chevron_right,
-                        color: Colors.grey, size: 20),
-                    showIconBackground: false,
-                    onTap: () {
-                      context.push('/terms-of-service');
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 48),
-              _buildFooter(),
             ],
           ),
-        );
-      },
+          const Padding(
+            padding: EdgeInsets.only(left: 16, top: 8, right: 16),
+            child: Text(
+              'Clearing the cache can cause light mode to be restored and the shopping cart/whishlist to be emptied.',
+              style: TextStyle(color: Colors.grey, fontSize: 13, height: 1.4),
+            ),
+          ),
+          const SizedBox(height: 24),
+          _buildSectionHeader('ABOUT'),
+          _buildSettingsCard(
+            isDark: isDark,
+            children: [
+              _buildSettingsItem(
+                icon: Icons.info_outline,
+                iconColor: Colors.green,
+                title: 'Version',
+                isDark: isDark,
+                trailing: const Text(
+                  '2.1.0 (Build 402)',
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+                onTap: () {},
+              ),
+              Divider(
+                  height: 1,
+                  indent: 56,
+                  color: isDark ? Colors.white10 : Colors.black12),
+              _buildSettingsItem(
+                title: 'Privacy Policy',
+                isDark: isDark,
+                trailing: const Icon(Icons.chevron_right,
+                    color: Colors.grey, size: 20),
+                showIconBackground: false,
+                onTap: () {
+                  context.push('/privacy-policy');
+                },
+              ),
+              Divider(
+                  height: 1,
+                  indent: 16,
+                  color: isDark ? Colors.white10 : Colors.black12),
+              _buildSettingsItem(
+                title: 'Terms of Service',
+                isDark: isDark,
+                trailing: const Icon(Icons.chevron_right,
+                    color: Colors.grey, size: 20),
+                showIconBackground: false,
+                onTap: () {
+                  context.push('/terms-of-service');
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 48),
+          _buildFooter(),
+        ],
+      ),
     );
   }
 
@@ -442,8 +438,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showOrderDetails(
-      BuildContext context, Order order, bool isDark, Map<String, String> t) {
+  void _showOrderDetails(BuildContext context, Order order, bool isDark) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -521,10 +516,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    t['settings_total']!,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
+                  const Text(
+                    'Totaal',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   Text(
                     '€${order.totalAmount.toStringAsFixed(2)}',
@@ -541,43 +535,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildLanguageButton(
-    String label,
-    AppLanguage targetLanguage,
-    AppLanguage currentLanguage,
-    LanguageProvider provider,
-    bool isDark, {
-    bool isFirst = false,
-    bool isLast = false,
-  }) {
-    final isSelected = currentLanguage == targetLanguage;
-
-    return GestureDetector(
-      onTap: () => provider.setLanguage(targetLanguage),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF6C63FF) : Colors.transparent,
-          borderRadius: BorderRadius.horizontal(
-            left: isFirst ? const Radius.circular(8) : Radius.zero,
-            right: isLast ? const Radius.circular(8) : Radius.zero,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected
-                ? Colors.white
-                : (isDark ? Colors.white70 : Colors.black54),
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            fontSize: 14,
-          ),
-        ),
-      ),
     );
   }
 }

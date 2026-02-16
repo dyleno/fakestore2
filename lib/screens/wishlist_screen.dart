@@ -3,8 +3,6 @@ import 'package:go_router/go_router.dart';
 import '../models/product.dart';
 import '../services/wishlist_service.dart';
 import '../widgets/product_card.dart';
-import '../language_provider.dart';
-import '../translations.dart';
 
 class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
@@ -18,30 +16,20 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<AppLanguage>(
-      valueListenable: LanguageProvider(),
-      builder: (context, language, _) {
-        final t = Translations.get(language);
-
-        return ValueListenableBuilder<List<Product>>(
-          valueListenable: _wishlistService.wishlistNotifier,
-          builder: (context, wishlist, child) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text(
-                  t['wishlist_title']!,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 24,
-                      letterSpacing: -0.5),
-                ),
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.shopping_cart_outlined),
-                    tooltip: t['wishlist_go_to_cart'],
-                    onPressed: () => context.push('/cart'),
-                  ),
-                  if (wishlist.isNotEmpty)
+    return ValueListenableBuilder<List<Product>>(
+      valueListenable: _wishlistService.wishlistNotifier,
+      builder: (context, wishlist, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'Mijn Favorieten',
+              style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 24,
+                  letterSpacing: -0.5),
+            ),
+            actions: wishlist.isNotEmpty
+                ? [
                     IconButton(
                       icon: const Icon(Icons.delete_sweep_outlined,
                           color: Colors.redAccent),
@@ -49,40 +37,37 @@ class _WishlistScreenState extends State<WishlistScreen> {
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: Text(t['wishlist_clear_title']!),
-                            content: Text(t['wishlist_clear_message']!),
+                            title: const Text('Verlanglijst leegmaken?'),
+                            content: const Text(
+                                'Weet je zeker dat je alle items wilt verwijderen?'),
                             actions: [
                               TextButton(
                                   onPressed: () => Navigator.pop(context),
-                                  child: Text(t['wishlist_clear_cancel']!)),
+                                  child: const Text('Annuleer')),
                               TextButton(
-                                onPressed: () {
-                                  _wishlistService.clearWishlist();
-                                  Navigator.pop(context);
-                                },
-                                child: Text(
-                                  t['wishlist_clear_confirm']!,
-                                  style: const TextStyle(color: Colors.red),
-                                ),
-                              ),
+                                  onPressed: () {
+                                    _wishlistService.clearWishlist();
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Ja, wis alles',
+                                      style: TextStyle(color: Colors.red))),
                             ],
                           ),
                         );
                       },
                     ),
-                ],
-              ),
-              body: wishlist.isEmpty
-                  ? _buildEmptyWishlist(t)
-                  : _buildWishlistGrid(wishlist),
-            );
-          },
+                  ]
+                : null,
+          ),
+          body: wishlist.isEmpty
+              ? _buildEmptyWishlist()
+              : _buildWishlistGrid(wishlist),
         );
       },
     );
   }
 
-  Widget _buildEmptyWishlist(Map<String, String> t) {
+  Widget _buildEmptyWishlist() {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -100,16 +85,16 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   size: 80, color: Color(0xFF6C63FF)),
             ),
             const SizedBox(height: 32),
-            Text(
-              t['wishlist_empty']!,
-              style: const TextStyle(
+            const Text(
+              'Je verlanglijst is nog leeg',
+              style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
                   color: Color(0xFF2D3142)),
             ),
             const SizedBox(height: 12),
             Text(
-              t['wishlist_empty_subtitle']!,
+              'Bewaar je favoriete items hier om ze later gemakkelijk terug te vinden.',
               textAlign: TextAlign.center,
               style:
                   TextStyle(fontSize: 16, color: Colors.grey[600], height: 1.5),
@@ -127,9 +112,9 @@ class _WishlistScreenState extends State<WishlistScreen> {
                       borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
-                child: Text(t['wishlist_start_shopping']!,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w700, fontSize: 16)),
+                child: const Text('Ontdek items',
+                    style:
+                        TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
               ),
             ),
           ],
