@@ -30,7 +30,7 @@ class TermsOfServiceScreen extends StatelessWidget {
               'Door gebruik te maken van de ShopMobile-applicatie ga je akkoord met deze algemene voorwaarden. Indien je niet akkoord gaat, verzoeken wij je de app te verwijderen.',
             ),
             _buildSection(
-              '2. Gebruik van de App',
+              '2. Gebruik van de Applicatie',
               'ShopMobile is een demonstratie-applicatie. De getoonde producten en prijzen zijn afkomstig van een publieke simulator-API (FakeStoreAPI) en zijn niet echt. Je kunt via deze app geen echte producten kopen of betalingen verrichten.',
             ),
             _buildSection(
