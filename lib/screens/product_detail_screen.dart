@@ -650,9 +650,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ? Colors.white
                       : Colors.black),
             ),
-            const Text(
-              'Bekijk alles',
-              style: TextStyle(
+            Text(
+              t['product_reviews_view_all']!,
+              style: const TextStyle(
                   color: Color(0xFF6C63FF), fontWeight: FontWeight.bold),
             ),
           ],
