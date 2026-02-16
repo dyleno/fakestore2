@@ -40,6 +40,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     });
   }
 
+  // Filter state
   String _selectedCategory = 'Alle';
 
   final TextEditingController _searchController = TextEditingController();
