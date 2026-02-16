@@ -27,19 +27,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   Future<void> _handleRefresh() async {
     setState(() {
-      _productsFuture = _apiService.getProducts();
+      _productsFuture = _apiService.getProducts(category: _selectedCategory);
       _categoriesFuture = _apiService.getCategories();
     });
     await Future.wait([_productsFuture, _categoriesFuture]);
-  }
-
-  late final Future<List<String>> _categoriesFuture =
-      _apiService.getCategories();
-
-  @override
-  void initState() {
-    super.initState();
-    _productsFuture = _apiService.getProducts();
   }
 
   void _onCategorySelected(String category) {
@@ -190,29 +181,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           if (snapshot.hasError) {
             return ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-    return FutureBuilder<List<Product>>(
-      future: _productsFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Fout: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('Geen producten gevonden.'));
-        }
-
-        final allProducts = snapshot.data!;
-        final products = allProducts.where((p) {
-          final matchesSearch =
-              p.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-                  p.category.toLowerCase().contains(_searchQuery.toLowerCase());
-          return matchesSearch;
-        }).toList();
-
-        if (products.isEmpty && _searchQuery.isNotEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(height: MediaQuery.of(context).size.height * 0.3),
                 Center(child: Text('Fout: ${snapshot.error}')),
@@ -236,6 +204,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     .toLowerCase()
                     .contains(_searchQuery.toLowerCase()) ||
                 p.category.toLowerCase().contains(_searchQuery.toLowerCase());
+            // Server-side filtering handle by _productsFuture, local filtering handles 'Alle' or edge cases
             final matchesCategory =
                 _selectedCategory == 'Alle' || p.category == _selectedCategory;
             return matchesSearch && matchesCategory;

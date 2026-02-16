@@ -630,7 +630,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ? Colors.white
                       : Colors.black),
             ),
-            Text(
+            const Text(
               'Bekijk alles',
               style: TextStyle(
                   color: Color(0xFF6C63FF), fontWeight: FontWeight.bold),

@@ -55,7 +55,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         themeProvider
                             .setTheme(val ? ThemeMode.dark : ThemeMode.light);
                       },
-                      activeThumbColor: const Color(0xFF6C63FF),
+                      activeColor: const Color(0xFF6C63FF),
                     ),
                     onTap: () {
                       themeProvider.toggleTheme();
@@ -182,12 +182,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Row(
+                      content: const Row(
                         children: [
-                          const Icon(Icons.check_circle_outline,
-                              color: Colors.white),
-                          const SizedBox(width: 12),
-                          const Text('Cache, Theme & Wishlist cleared'),
+                          Icon(Icons.check_circle_outline, color: Colors.white),
+                          SizedBox(width: 12),
+                          Text('Cache, Theme & Wishlist cleared'),
                         ],
                       ),
                       backgroundColor: Colors.green.shade800,
@@ -306,7 +305,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: showIconBackground
-                      ? iconColor?.withValues(alpha: 0.1)
+                      ? iconColor?.withOpacity(0.1)
                       : Colors.transparent,
                   shape: BoxShape.circle,
                 ),
